@@ -1,24 +1,21 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import NavBar from "./components/navBar";
+import Main from "./main";
+import Sidebar from "./components/sidebar";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg-gray-200 flex flex-col w-full min-h-screen">
+        <Sidebar/>
+        <NavBar/>
+        <div className="h-full flex justify-center pl-72">
+            <div className="w-4/5">
+                <Main/>
+            </div>
+        </div>
+        <ToastContainer/>
     </div>
   );
 }
