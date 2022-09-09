@@ -8,6 +8,7 @@ import DataTable from 'react-data-table-component';
 import {Link} from "react-router-dom";
 import Modal from "../../components/modal";
 import { toast } from 'react-toastify';
+import { useQuery, gql } from "@apollo/client";
 
 export interface dataProps {
     name: string;
@@ -16,6 +17,7 @@ export interface dataProps {
     gstRegType: string;
     rgdt: string;
 }
+
 
 const ViewPage = () => {
 
@@ -86,24 +88,23 @@ const ViewPage = () => {
         gstRegType: '',
         rgdt: '',
     }]);
-    const [error, setError] = React.useState(null);
 
-    React.useEffect(() => {
-        fetch("")
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    setItems(result.gstin);
-                },
-                (error) => {
-                    console.log(error);
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
-    }, [])
+    const QUERY = gql`
+      {
+        users{
+            users{
+                id
+            }
+        }
+      }`;
 
+    const { data, error } = useQuery(QUERY);
+
+    if (error) { // @ts-ignore
+        return <pre>{error.message}</pre>
+    }
+
+    
     return (
         <div>
             <div className="m-10">
