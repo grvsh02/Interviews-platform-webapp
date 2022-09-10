@@ -5,6 +5,7 @@ import {faTrashCan, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import StatusTag from "../../components/statusTag";
 import  { useNavigate } from 'react-router-dom'
 import GraphQLFetch from "../../utils/graphqlFetch";
+import {toast} from "react-toastify";
 
 const customStyles = {
     rows: {
@@ -81,6 +82,25 @@ const UserTable = ({keyword = ""}) => {
         });
     }
 
+    const handleDelete = (variables) => {
+        GraphQLFetch({
+            query: `
+                mutation ($id: Int!){
+                    deleteUser(id: $id)
+                }
+            `,
+            variables
+        }).then((res) => {
+            if (res.data.deleteUser) {
+                setReload(!reload);
+            }
+            toast.success("Deleted successfully !",
+                {
+                    position: toast.POSITION.TOP_RIGHT
+                })
+        });
+    }
+
     const columns = [
         {
             name: 'Name',
@@ -115,12 +135,16 @@ const UserTable = ({keyword = ""}) => {
             selector: (row) => {
                 return (
                     <div className="flex items-center">
-                        <FontAwesomeIcon icon={faTrashCan} size={'2x'} className="cursor-pointer"
-                                         onClick={() => {}}/>
-                        <FontAwesomeIcon icon={faCheck} size={'2x'} className="cursor-pointer ml-2" 
-                                         onClick={() => {handleAccept({"id": parseInt(row.id), "status": "Accepted"})}}/>
-                        <FontAwesomeIcon icon={faTimes} size={'2x'} className="cursor-pointer ml-2"
-                                         onClick={() => {handleAccept({"id": parseInt(row.id), "status": "Rejected"})}}/>
+                        <FontAwesomeIcon icon={faTrashCan} size={'2x'} className="cursor-pointer text-red-500"
+                                            onClick={() => {handleDelete({"id": parseInt(row.id)})}}/>
+                        {row.status === "inReview" && (
+                            <FontAwesomeIcon icon={faCheck} size={'2x'} className="cursor-pointer ml-2 text-green-500"
+                                             onClick={() => {handleAccept({"id": parseInt(row.id), "status": "Accepted"})}}/>
+                        )}
+                        {row.status === "inReview" && (
+                            <FontAwesomeIcon icon={faTimes} size={'2x'} className="cursor-pointer ml-2 text-red-500"
+                                             onClick={() => {handleAccept({"id": parseInt(row.id), "status": "Rejected"})}}/>
+                        )}
                     </div>
                     )
             },
@@ -140,7 +164,7 @@ const UserTable = ({keyword = ""}) => {
                 highlightOnHover={true}
                 customStyles={customStyles}
                 pagination={true}
-                onRowClicked={(row) => {navigate('/users/' + row.id)}}
+                onRowClicked={(row) => {navigate('/user/' + row.id)}}
             />
         );
     }

@@ -66,12 +66,13 @@ const AddPage = () => {
     }
 
     const handleSave = () => {
-        setUser({...user})
+        const u: any = user
+        console.log(u)
         graphqlFetch({
             query: `mutation($user: UserInput!){
                 addUser(user: $user)
             }`,
-            variables: {"user": user}
+            variables: {"user": u}
         }).then((response) => {
             if (response.data.addUser){
                 toast.success("User Added !", {
@@ -110,7 +111,6 @@ const AddPage = () => {
                                 onButtonClick={() => setIsOpen(true)}
                                 onChange={(role) => {
                                     setUser({...user, role: role});
-                                    console.log(user, role)
                                 }}
                             />
                             <div className="mt-10">
