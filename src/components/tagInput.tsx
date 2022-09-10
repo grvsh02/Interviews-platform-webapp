@@ -1,13 +1,38 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import './tag.css'
+import GraphqlFetch from "../utils/graphqlFetch";
 
-const TagsInput = () => {
-    const [tags, setTags] = useState(['sample', 'URLs'])
+type TagsInputProps = {
+    setNewTags?: ([]) => void
+}
+
+const TagsInput = ({setNewTags = () => {}}: TagsInputProps) => {
+    const [tags, setTags] = useState([''])
+
+    useEffect(() => {
+        GraphqlFetch({
+          query: `query {
+            roles {
+                role
+            }
+           }`,
+        }).then((response) => {
+            let rolesFetched: any[] = []
+            response.data.roles.map((role: any) => {
+                rolesFetched = [...rolesFetched,role.role]
+            })
+            setTags(rolesFetched)
+        })
+    },[])
+
+    let newTags: any[] = []
 
     const handleKeyDown = (e: any) => {
         if(e.key !== 'Enter') return
         const value = e.target.value
         if(!value.trim()) return
+        newTags = [...newTags, value]
+        setNewTags(newTags)
         setTags([...tags, value])
         e.target.value = ''
     }

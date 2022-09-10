@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Card from "../../components/card";
 import LabelTextInput from "../../components/labelTextInput";
 import Dropdown from "../../components/dropdown";
@@ -7,7 +7,17 @@ import Modal from "../../components/modal";
 import TagsInput from "../../components/tagInput";
 import {toast} from "react-toastify";
 import  { useNavigate } from 'react-router-dom'
+import GraphqlFetch from "../../utils/graphqlFetch";
+import graphqlFetch from "../../utils/graphqlFetch";
 
+export type UserProps = {
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone?: string,
+    status: string,
+    role: string,
+}
 
 const AddPage = () => {
 
@@ -15,70 +25,110 @@ const AddPage = () => {
 
     const [isOpen, setIsOpen] = React.useState(false);
 
+    const [roles, setRoles] = useState([''])
+    const [newTags, setNewTags] = useState([])
+    const [reload, setReload] = useState(false)
+
+    // @ts-ignore
+    const [user, setUser] = useState<UserProps>(null)
+
+    useEffect(() => {
+        GraphqlFetch({
+            query: `query {
+                roles {
+                    role
+                }
+            }`,
+        }).then((response) => {
+            let rolesFetched: any[] = []
+            response.data.roles.map((role: any) => {
+                rolesFetched = [...rolesFetched, role.role]
+            })
+            setRoles(rolesFetched)
+        })
+    }, [reload])
+
     const handleAdd = () => {
         setIsOpen(false);
-        // API call to add
-        toast.success("Tags Added !", {
-            position: toast.POSITION.TOP_RIGHT
-        });
+        GraphqlFetch({
+            query:`mutation($roles: [String!]!){
+                addRoles(roles: $roles)
+            }`,
+            variables: {"roles" : newTags}
+        }).then((respose) => {
+            if (respose.data.addRoles){
+                toast.success("Roles Added !", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            }
+        })
+        setReload(!reload)
     }
 
     const handleSave = () => {
-        // API call to save
-        toast.success("Saved !", {
-            position: toast.POSITION.TOP_RIGHT
-        });
-        navigate('/');
+        setUser({...user})
+        graphqlFetch({
+            query: `mutation($user: UserInput!){
+                addUser(user: $user)
+            }`,
+            variables: {"user": user}
+        }).then((response) => {
+            if (response.data.addUser){
+                toast.success("User Added !", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+                navigate('/');
+            }
+        })
     }
 
     return (
-        <div className="flex flex-row h-full">
-            <div className="w-1/3 pl-10 pt-5 items-center">
-                    <div className="">
-                        <div className="mb-8">
-                            <div className="text-xl font-bold m-2">Add Client</div>
-                            <div className="m-2">
-                                Enter the Gst number of the client.<br/>
-                                You can add GST number which has GST type as Regular and Composition.
-                            </div>
-                        </div>
-                        <div className="mb-4">
-                            <div className="text-xl font-bold m-2">Here are your Plan details</div>
-                            <div className="m-2">
-                                Available GSTIN credits - 319 <br/>
-                                Expiry date - 31st March 2021<br/>
-                            </div>
-                        </div>
-                    </div>
-            </div>
-            <div className="w-2/3 h-full">
+        <div className="flex flex-row justify-center h-full">
+            <div className="w-2/3 h-full ">
                 <Card className="m-5">
-                    <div className="p-10 align-middle h-full">
-                        <LabelTextInput label="Enter one or more GSTIN to import" type="text" className="mt-10" placeholder="Enter GSTIN numbers"/>
-                        <Dropdown
-                            label="Select Tag"
-                            className="mt-10"
-                            placeholder="Showing All Tags"
-                            items={[{"name": "sample"},{"name": "URLs"}]}
-                            hasButton={true}
-                            buttonText="Add +"
-                            onButtonClick={() => {setIsOpen(true)}}
-                        />
-                        <div className="mt-10">
-                            Paste all the client GSTIN in the box which you like to import. Each GSTIN should be in a new line.<br/>
-                            QRMP prefrences along with GST return status from Jan 2021 till date will be imported automatically.
+                    <div className="p-10">
+                        <div className="text-4xl align-middle font-semibold">Add Candidate</div>
+                        <div className="align-middle h-full">
+                            <LabelTextInput label="First Name" type="text" className="mt-10" placeholder="" required={true} onChange={(fname) => setUser({...user,firstName: fname})}/>
+                            <LabelTextInput label="Last Name" type="text" className="mt-10" placeholder="" onChange={(lname) => setUser({...user,lastName: lname})}/>
+                            <LabelTextInput label="Email" type="email" className="mt-10" placeholder="" required={true} onChange={(email) => setUser({...user,email: email})}/>
+                            <LabelTextInput label="Phone Number" type="text" className="mt-10" placeholder="" onChange={(no) => setUser({...user,phone: no})}/>
+                            <Dropdown
+                                label="Select Status"
+                                className="mt-10"
+                                placeholder="Showing All Tags"
+                                items={["inReview", "Accepted", "Rejected"]}
+                                onChange={(status) => setUser({...user,status: status})}
+                            />
+                            <Dropdown
+                                label="Select Role"
+                                className="mt-10"
+                                placeholder="Showing All Tags"
+                                items={roles}
+                                hasButton={true}
+                                buttonText="Add +"
+                                onButtonClick={() => setIsOpen(true)}
+                                onChange={(role) => {
+                                    setUser({...user, role: role});
+                                    console.log(user, role)
+                                }}
+                            />
+                            <div className="mt-10">
+                                Paste all the client GSTIN in the box which you like to import. Each GSTIN should be in a new line.<br/>
+                                QRMP prefrences along with GST return status from Jan 2021 till date will be imported automatically.
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <Button className='m-2' onClick={handleSave}>
-                            Save Multiple GSTIN
-                        </Button>
+                        <div className="flex justify-end">
+                            <Button className='m-2' onClick={handleSave}>
+                                Save
+                            </Button>
+                        </div>
                     </div>
                 </Card>
             </div>
             <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-                <div className="text-2xl font-semibold">Add Tags</div>
-                <div className="text-lg mt-5"><TagsInput/></div>
+                <div className="text-2xl font-semibold">Add Roles</div>
+                <div className="text-lg mt-5"><TagsInput setNewTags={(data: any) => setNewTags(data)}/></div>
                 <div className="flex justify-end mt-10">
                     <Button className="mr-5" onClick={() => setIsOpen(false)}>Cancel</Button>
                     <Button className="bg-red-500" onClick={() => {handleAdd()}}>Add</Button>

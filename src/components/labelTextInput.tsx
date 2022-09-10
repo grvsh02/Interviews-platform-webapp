@@ -25,7 +25,7 @@ const TextFieldContainer = styled.div`
     font-family: Pangram, sans-serif;
 `;
 
-const InputContainer = styled.textarea`
+const InputContainer = styled.input`
     width: 100%;
     padding: 0.5rem 0.5rem 0.5rem 0.7rem;
     border: 2px solid #828282;
@@ -41,7 +41,7 @@ const InputContainer = styled.textarea`
     }
 `;
 
-const LabelTextInput = ({ placeholder="Email Address", label = "label" , errorText, charLimit, showLimit, showCharLimit, disabled, onChange = () => {}, required, type, className, value }: IconTextInput) => {
+const LabelTextInput = ({ placeholder="Email Address", label = "label" , errorText, charLimit, disabled, onChange = () => {}, required, type, className, value }: IconTextInput) => {
 
     const [inputValue, setInputValue] = React.useState(value !== null ? value : "");
 
@@ -61,8 +61,6 @@ const LabelTextInput = ({ placeholder="Email Address", label = "label" , errorTe
         }
     };
 
-    const [stroke, setStroke] = React.useState("#828282");
-
     return (
         <TextFieldContainer className={className}>
             <div className={charLimit ? 'w-2/3 px-0' : 'w-full px-0'}>
@@ -76,7 +74,7 @@ const LabelTextInput = ({ placeholder="Email Address", label = "label" , errorTe
                         {value?.length}/{charLimit}
                     </div>}
             </div>
-            <InputContainer placeholder={placeholder} onChange={handleChange} disabled={disabled} value={inputValue} rows={10} />
+            <InputContainer placeholder={placeholder} onChange={handleChange} disabled={disabled} value={inputValue} />
             {errorText &&
                 <div className="text-red-400 mt-1 text-xs italic">
                     {errorText}

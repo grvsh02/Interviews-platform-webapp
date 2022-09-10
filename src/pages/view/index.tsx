@@ -1,23 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Card from "../../components/card";
 import Button from "../../components/button";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTrashCan, faDownload} from "@fortawesome/free-solid-svg-icons";
+import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import Searchbar from "../../components/searchbar";
-import DataTable from 'react-data-table-component';
+
 import {Link} from "react-router-dom";
 import Modal from "../../components/modal";
 import { toast } from 'react-toastify';
-import { useQuery, gql } from "@apollo/client";
 
-export interface dataProps {
-    name: string;
-    lgnm: string;
-    gstin: string;
-    gstRegType: string;
-    rgdt: string;
-}
-
+import UserTable from "./userTable";
 
 const ViewPage = () => {
 
@@ -25,105 +17,29 @@ const ViewPage = () => {
 
     const handleDelete = () => {
         setIsOpen(false);
-        // API call to delete
         toast.success("Deleted successfully !", {
             position: toast.POSITION.TOP_RIGHT
         });
     }
 
-    const columns = [
-        {
-            name: 'Legal Name',
-            selector: (row: { lgnm: any; }) => row.lgnm,
-        },
-        {
-            name: 'Trade Name',
-            selector: (row: { name: any; }) => row.name,
-        },
-        {
-            name: 'GST Number',
-            selector: (row: { gstin: any; }) => row.gstin,
-        },
-        {
-            name: 'Gst Type',
-            selector: (row: { gstRegType: any; }) => row.gstRegType,
-        },
-        {
-            name: 'Registration Date',
-            selector: (row: { rgdt: any; }) => row.rgdt,
-        },
-        {
-            name: 'Delete',
-            selector: () => <FontAwesomeIcon icon={faTrashCan} size={'1x'} className="cursor-pointer" onClick={() => setIsOpen(true)}/>,
-        }
+    const [keyword, setKeyword] = React.useState('');
 
-    ];
+    useEffect(() => {}, [keyword])
 
-    const customStyles = {
-        rows: {
-            style: {
-                minHeight: '62px',
-            },
-        },
-        headCells: {
-            style: {
-                paddingLeft: '8px',
-                paddingRight: '8px',
 
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '8px',
-                paddingRight: '8px',
-            },
-        },
-    };
-
-    const [isLoaded, setIsLoaded] = React.useState(false);
-    const [items, setItems] = React.useState([{
-        name: '',
-        lgnm: '',
-        gstin: '',
-        gstRegType: '',
-        rgdt: '',
-    }]);
-
-    const QUERY = gql`
-      {
-        users{
-            users{
-                id
-            }
-        }
-      }`;
-
-    const { data, error } = useQuery(QUERY);
-
-    if (error) { // @ts-ignore
-        return <pre>{error.message}</pre>
-    }
-
-    
     return (
         <div>
             <div className="m-10">
                 <div className="text-4xl font-semibold">All GSTINs</div>
                 <div className="w-full flex justify-between mt-10">
-                    <Link to="/add"><Button>Add GSTIN</Button></Link>
-                    <Searchbar/> {/* add onSearch parameter and add a function to call api for searching*/}
+                    <Link to="/add"><Button>Add Candidate</Button></Link>
+                    <Searchbar onSearch={setKeyword}/> {/* add onSearch parameter and add a function to call api for searching*/}
                     <Button><FontAwesomeIcon icon={faDownload} className="mt-1"/>Export as XLSX</Button>
                 </div>
                 <div>
                     <Card className="mt-10">
                         <div>
-                            <DataTable
-                                columns={columns}
-                                data={items}
-                                highlightOnHover={true}
-                                customStyles={customStyles}
-                                pagination={true}
-                            />
+                            <UserTable keyword={keyword} />
                         </div>
                     </Card>
                 </div>

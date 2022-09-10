@@ -8,9 +8,14 @@ type SearchbarProps = {
 }
 
 const Searchbar = ({keyword, onSearch = () => {}}: SearchbarProps) => {
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onSearch(e.target.value);
+    }
+
     return (
         <div className="w-2/5 h-12 flex bg-white relative">
-            <input className="min-w-full pl-8" onChange={() => onSearch} value={keyword} placeholder="Search by legal name, trade name or GST number"></input>
+            <input className="min-w-full pl-8" onChange={handleSearch} value={keyword} placeholder="Search by Name, email or phone no. "></input>
             <FontAwesomeIcon icon={faSearch} className="absolute left-2 top-4"/>
         </div>
     )

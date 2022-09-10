@@ -14,10 +14,7 @@ type DropdownProps = {
     hasButton?: boolean,
     onButtonClick?: () => void,
     buttonText?: string,
-    items?: {
-        name?: any,
-        className?: string,
-    }[]
+    items?: string[],
 }
 
 const TextFieldContainer = styled.div`
@@ -35,7 +32,7 @@ const DropDownContainer = styled.div`
     display: flex;
     border: 1px solid #828282;
     color: #030e19;
-    font-size: 12px;
+    font-size: 14px;
     font-family: Pangram, sans-serif;
     border-radius: 4px;
     ::placeholder {
@@ -72,7 +69,7 @@ const DropDownMenu = styled('div')`
   width: 100%;
 `;
 
-const Dropdown = ({ items = [], onClose = () => {}, className = '', placeholder, label, isSelected, disabled, onChange = () => {}, hasButton, onButtonClick, buttonText } : DropdownProps) =>{
+const Dropdown = ({ items = [], onClose = () => {}, className = '', placeholder, label, isSelected, disabled, onChange = () => {}, hasButton, onButtonClick, buttonText } : DropdownProps) => {
 
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedItem, setSelectedItem] = React.useState(isSelected ? isSelected : "");
@@ -99,12 +96,12 @@ const Dropdown = ({ items = [], onClose = () => {}, className = '', placeholder,
                     <div role="menu" onMouseLeave={onClose}>
                         {items.length > 0 && items.map((n,i) => {
                             return (
-                                <InputContainer key={i} className={n?.className} onClick={() => {
-                                    onChange(n?.name);
-                                    setSelectedItem(n?.name);
+                                <InputContainer key={i}  onClick={() => {
+                                    onChange(n);
+                                    setSelectedItem(n);
                                     setIsOpen(false);
                                 }}>
-                                    {n?.name}
+                                    {n}
                                 </InputContainer>
                             )
                         })}
