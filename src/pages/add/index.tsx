@@ -113,12 +113,8 @@ const AddPage = () => {
                                     setUser({...user, role: role});
                                 }}
                             />
-                            <div className="mt-10">
-                                Paste all the client GSTIN in the box which you like to import. Each GSTIN should be in a new line.<br/>
-                                QRMP prefrences along with GST return status from Jan 2021 till date will be imported automatically.
-                            </div>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex mt-7 justify-end">
                             <Button className='m-2' onClick={handleSave}>
                                 Save
                             </Button>

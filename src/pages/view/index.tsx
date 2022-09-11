@@ -30,7 +30,7 @@ const ViewPage = () => {
     return (
         <div>
             <div className="m-10">
-                <div className="text-4xl font-semibold">All GSTINs</div>
+                <div className="text-4xl font-semibold">All Candidates</div>
                 <div className="w-full flex justify-between mt-10">
                     <Link to="/add"><Button>Add Candidate</Button></Link>
                     <Searchbar onSearch={setKeyword}/> {/* add onSearch parameter and add a function to call api for searching*/}
@@ -45,8 +45,8 @@ const ViewPage = () => {
                 </div>
             </div>
             <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-                <div className="text-2xl font-semibold">Delete GSTIN</div>
-                <div className="text-lg mt-5">Are you sure you want to delete this GSTIN?</div>
+                <div className="text-2xl font-semibold">Delete Candidate</div>
+                <div className="text-lg mt-5">Are you sure you want to delete this Candidate?</div>
                 <div className="flex justify-end mt-10">
                     <Button className="mr-5" onClick={() => setIsOpen(false)}>Cancel</Button>
                     <Button className="bg-red-500" onClick={() => {handleDelete()}}>Delete</Button>
